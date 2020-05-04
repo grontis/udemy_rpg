@@ -16,15 +16,21 @@ namespace RPG.Control
 
         private NavMeshAgent _navMeshAgent;
         private Fighter _fighter;
+        private Mover _mover;
         private GameObject _player;
         private Health _health;
+
+        private Vector3 _guardLocation;
 
         private void Start()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _fighter = GetComponent<Fighter>();
+            _mover = GetComponent<Mover>();
             _player = GameObject.FindWithTag("Player");
             _health = GetComponent<Health>();
+
+            _guardLocation = transform.position;
         }
 
         private void Update()
@@ -37,7 +43,8 @@ namespace RPG.Control
             }
             else
             {
-                _fighter.Cancel();
+                //stop fighting, and move back to starting guard position
+                _mover.StartMoveAction(_guardLocation);
             }
         }
         
@@ -46,6 +53,14 @@ namespace RPG.Control
         {
             float v = Vector3.Distance(transform.position, _player.transform.position);
             return v < chaseDistance;
+        }
+
+        //Called by Unity Editor
+        private void OnDrawGizmosSelected()
+        {
+            //Gizmo for representing the enemy AI chase radius
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position, chaseDistance);
         }
     }
 }
